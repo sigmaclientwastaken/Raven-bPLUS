@@ -1,6 +1,7 @@
 package keystrokesmod.client.module;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -175,8 +176,12 @@ public class Module {
         return null;
     }
 
-    public void registerSetting(Setting Setting) {
-        this.settings.add(Setting);
+    public void registerSetting(Setting setting) {
+        this.settings.add(setting);
+    }
+
+    public void registerSettings(Setting... settings) {
+        Collections.addAll(this.settings, settings);
     }
 
     public void setVisableInHud(boolean vis) {

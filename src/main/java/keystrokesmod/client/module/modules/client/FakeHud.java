@@ -85,17 +85,17 @@ public class FakeHud extends Module {
     }
 
     public void onEnable() {
-        sortModules();
+    //    sortModules();
     }
 
-    public static void sortModules() {
-        if (HUD.positionMode == Utils.HUD.PositionMode.UPLEFT || HUD.positionMode == Utils.HUD.PositionMode.UPRIGHT) {
-            sortShortLong();
-        } else if (HUD.positionMode == Utils.HUD.PositionMode.DOWNLEFT
-                || HUD.positionMode == Utils.HUD.PositionMode.DOWNRIGHT) {
-            sortLongShort();
-        }
-    }
+    //public static void sortModules() {
+    //    if (HUD.positionMode == Utils.HUD.PositionMode.UPLEFT || HUD.positionMode == Utils.HUD.PositionMode.UPRIGHT) {
+    //        sortShortLong();
+    //    } else if (HUD.positionMode == Utils.HUD.PositionMode.DOWNLEFT
+    //            || HUD.positionMode == Utils.HUD.PositionMode.DOWNRIGHT) {
+    //        sortLongShort();
+    //    }
+    //}
 
     public static List<Module> getModules() {
         int i = 0;
@@ -118,14 +118,14 @@ public class FakeHud extends Module {
         Module m = new Module(str, ModuleCategory.client);
         m.enable();
         list.add(m);
-        sortModules();
+    //    sortModules();
     }
 
     public static void removeModule(String str) {
         for (Module module : list) {
             if (module.getName().equals(str)) {
                 list.remove(module);
-                sortModules();
+   //             sortModules();
                 return;
             }
         }

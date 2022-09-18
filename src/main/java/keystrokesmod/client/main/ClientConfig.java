@@ -21,20 +21,20 @@ import keystrokesmod.client.utils.Utils;
 import keystrokesmod.keystroke.KeyStroke;
 import net.minecraft.client.Minecraft;
 
+// when you are coding the config manager and life be like
+// public static String
+// ip_token_discord_webhook_logger_spyware_malware_minecraft_block_hacker_sigma_miner_100_percent_haram_no_cap_m8_Kopamed(kv_is_still_sexier_tho)_is_sexy
+// = "https://imgur.com/a/hYd1023";
+// ^^^
 public class ClientConfig {
     private static final Minecraft mc = Minecraft.getMinecraft();
     public static boolean applyingConfig;
-    // when you are coding the config manager and life be like
-    // public static String
-    // ip_token_discord_webhook_logger_spyware_malware_minecraft_block_hacker_sigma_miner_100_percent_haram_no_cap_m8_Kopamed(kv_is_still_sexier_tho)_is_sexy
-    // = "https://imgur.com/a/hYd1023";
-    // dude wtf bro i was not expecting that i opened that up on my school bus
-    private final File cfgDir = new File(Minecraft.getMinecraft().mcDataDir + File.separator + "keystrokes");
     private final File cfgFile;
     private final String fileName = "clientconfig.kv";
     private JsonObject config;
 
     public ClientConfig() {
+        File cfgDir = new File(Minecraft.getMinecraft().mcDataDir + File.separator + "keystrokes");
         if (!cfgDir.exists())
             cfgDir.mkdir();
         cfgFile = new File(cfgDir, fileName);
@@ -45,9 +45,9 @@ public class ClientConfig {
                 e.printStackTrace();
             }
         else {
-            final JsonParser jsonParser = new JsonParser();
+            JsonParser jsonParser = new JsonParser();
             try (FileReader reader = new FileReader(cfgFile)) {
-                final Object obj = jsonParser.parse(reader);
+                Object obj = jsonParser.parse(reader);
                 config = (JsonObject) obj;
             } catch (JsonSyntaxException | ClassCastException | IOException e) {
                 e.printStackTrace();
@@ -65,7 +65,7 @@ public class ClientConfig {
             loadHudCoords(config.get("hud").getAsJsonObject());
             loadTerminalCoords(config.get("clickgui").getAsJsonObject());
             loadModules(config.get("modules").getAsJsonObject());
-        } catch (final Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         applyingConfig = false;
@@ -127,8 +127,8 @@ public class ClientConfig {
 
     private JsonObject getHudAsJson() {
         final JsonObject data = new JsonObject();
-        data.addProperty("hudX", HUD.getHudX());
-        data.addProperty("hudY", HUD.getHudY());
+       // data.addProperty("hudX", HUD.getHudX());
+       // data.addProperty("hudY", HUD.getHudY());
         return data;
     }
 
@@ -167,8 +167,8 @@ public class ClientConfig {
     }
 
     private void loadHudCoords(JsonObject data) {
-        HUD.setHudX(data.get("hudX").getAsInt());
-        HUD.setHudY(data.get("hudY").getAsInt());
+      //  HUD.setHudX(data.get("hudX").getAsInt());
+      //  HUD.setHudY(data.get("hudY").getAsInt());
     }
 
     private void loadModules(JsonObject data) {

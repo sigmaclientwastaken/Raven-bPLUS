@@ -13,6 +13,15 @@ import java.lang.reflect.Method;
 
 public class RenderUtils {
 
+    /**
+     * it no work kv pls fix
+     */
+    public static int hsbRainbow(float s, float b, int offset, int seconds) {
+        float shit = (seconds*1000f)/360f;
+        float h = 360*(((System.currentTimeMillis()+offset)%(seconds*1000f))/shit);
+        return Color.HSBtoRGB(h, s, b);
+    }
+
     public static void stopDrawing() {
         GL11.glDisable(3042);
         GL11.glEnable(3553);

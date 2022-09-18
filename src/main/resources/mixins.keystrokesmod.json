@@ -10,11 +10,13 @@
         "MixinEntityPlayerSP",
         "MixinEntityRenderer",
         "MixinFontRenderer",
+        "MixinGuiChat",
         "MixinGuiUtilRenderComponents",
         "MixinMinecraft",
         "MixinNetworkManager"
     ],
     "client": [
-        "IMinecraft"
+        "IMinecraft",
+        "MixinGuiScreen"
     ]
 }
