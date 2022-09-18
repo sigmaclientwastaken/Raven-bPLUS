@@ -20,11 +20,12 @@ public class MixinGuiChat {
 
     @Inject(method = "drawScreen", at = @At("RETURN"))
     public void kms(int p_drawScreen_1_, int p_drawScreen_2_, float p_drawScreen_3_, CallbackInfo ci) {
+        HUD.getInstance().updateDrag(p_drawScreen_1_, p_drawScreen_2_);
+
         HUD.getInstance().comps.forEach((compC, comp) -> {
             GlStateManager.resetColor();
             comp.draw(true);
         });
-
     }
 
 }

@@ -21,7 +21,7 @@ public class WatermarkComponent extends HudComponent {
 
     @Override
     public EnumSide getSide() {
-        return EnumSide.getSide(x, new ScaledResolution(mc));
+        return EnumSide.LEFT;
     }
 
     @Override
