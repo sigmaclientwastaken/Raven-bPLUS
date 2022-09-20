@@ -10,8 +10,8 @@ import java.awt.*;
 public class RGBSetting extends Setting {
 
     private final String name;
-    private int[] colour = new int[2];
-    private int[] defaultColour = new int[2];
+    private int[] colour;
+    private int[] defaultColour;
     private int colorRGB;
 
     public RGBSetting(String name, int defaultRed, int defaultGreen, int defaultBlue) {
@@ -98,6 +98,10 @@ public class RGBSetting extends Setting {
     public void setColor(int colour, int value) {
         this.colour[colour] = value;
         this.colorRGB = new Color(this.colour[0], this.colour[1], this.colour[2]).getRGB();
+    }
+
+    public Color getColor() {
+        return new Color(this.colour[0], this.colour[1], this.colour[2]);
     }
 
     public void setColors(int[] colour) {

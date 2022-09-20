@@ -54,12 +54,19 @@ public class WatermarkComponent extends HudComponent {
         switch (HUD.watermarkColorMode.getMode()) {
 
             case Static:
-                color = HUD.generalColor.getRGB();
+                color = HUD.ColorMode.Static.getColor().value(0);
                 break;
 
             case Rainbow:
-                color = RenderUtils.hsbRainbow((float) HUD.generalRainbowSaturation.getInput(),(float) HUD.generalRainbowBrightness.getInput(), 0,
-                        (int) HUD.generalRainbowSeconds.getInput());
+                color = HUD.ColorMode.Rainbow.getColor().value(0);
+                break;
+
+            case Fade:
+                color = HUD.ColorMode.Fade.getColor().value(0);
+                break;
+
+            case Astolfo:
+                color = HUD.ColorMode.Astolfo.getColor().value(0);
                 break;
 
         }

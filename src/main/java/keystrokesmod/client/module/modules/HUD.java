@@ -6,11 +6,15 @@ import keystrokesmod.client.hud.HudComponent;
 import keystrokesmod.client.hud.impl.WatermarkComponent;
 import keystrokesmod.client.module.Module;
 import keystrokesmod.client.module.setting.impl.*;
+import keystrokesmod.client.utils.ColorSupplier;
+import keystrokesmod.client.utils.RenderUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import org.fusesource.jansi.Ansi;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static net.minecraft.util.EnumChatFormatting.*;
 
@@ -20,6 +24,7 @@ public class HUD extends Module {
     public static TickSetting watermarkOnlyFirstChar;
 
     public static TickSetting generalMcFont;
+    public static TickSetting generalMcFontShadow;
     public static SliderSetting generalRainbowSaturation;
     public static SliderSetting generalRainbowBrightness;
     public static SliderSetting generalRainbowSeconds;
@@ -49,6 +54,7 @@ public class HUD extends Module {
                 new DescriptionSetting(" "),
                 new DescriptionSetting(GRAY + "General Settings"), // register general settings with red + reset at the end to prevent duplicate names
                 generalMcFont = new TickSetting("Minecraft Font" + RED + RESET, true),
+                generalMcFontShadow = new TickSetting("MC Font Shadow"  + RED + RESET, true),
                 generalColor = new RGBSetting("Color" + RED + RESET, 107, 105, 214),
                 generalRainbowBrightness = new SliderSetting("Rainbow Brightness" + RED + RESET, 1, 0, 1, 0.01),
                 generalRainbowSaturation = new SliderSetting("Rainbow Saturation" + RED + RESET, 1, 0, 1, 0.01),
@@ -113,10 +119,22 @@ public class HUD extends Module {
     }
 
     public enum ColorMode {
-        Static, // done
-        Fade,
-        Rainbow, // done
-        Astolfo
+        Static((in) -> generalColor.getRGB()),
+        Fade((in) -> RenderUtils.blend(generalColor.getColor(), generalColor.getColor().darker(), in/100D).getRGB()),
+        Rainbow((in) -> RenderUtils.hsbRainbow((float) generalRainbowSaturation.getInput(),(float) generalRainbowBrightness.getInput(),
+                (int) (in * generalRainbowOffset.getInput()), (int) generalRainbowSeconds.getInput())),
+        Astolfo((in) -> -1);
+
+        private final ColorSupplier color;
+
+        ColorMode(ColorSupplier color) {
+            this.color = color;
+        }
+
+        public ColorSupplier getColor() {
+            return color;
+        }
+
     }
 
 }

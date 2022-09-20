@@ -63,12 +63,15 @@ public class LegitAura2 extends Module {
 
     @Subscribe
     public void packet(PacketEvent e) {
+        /*
         Packet p = e.getPacket();
         if(target != null && p instanceof MixinC03PacketPlayer) {
             MixinC03PacketPlayer pe = (MixinC03PacketPlayer) e.getPacket();
             pe.setYaw(yaw);
             pe.setPitch(pitch);;
         }
+         */
+        // why why why why why why why (this is a terrible idea and a ban speedrun)
     }
 
     @Subscribe
