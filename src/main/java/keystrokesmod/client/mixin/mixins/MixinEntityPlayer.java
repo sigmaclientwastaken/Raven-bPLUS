@@ -105,7 +105,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
 
                             Module keepSprint = Raven.moduleManager.getModuleByClazz(KeepSprint.class);
                             if (keepSprint != null && keepSprint.isEnabled()) {
-                                KeepSprint.sl(p_attackTargetEntityWithCurrentItem_1_);
+                                KeepSprint.slowdown(p_attackTargetEntityWithCurrentItem_1_);
                             } else {
                                 this.motionX *= 0.6D;
                                 this.motionZ *= 0.6D;

@@ -22,7 +22,7 @@ public class KeepSprint extends Module {
         this.registerSetting(sprint = new TickSetting("Stop Sprint", true));
     }
 
-    public static void sl(Entity en) {
+    public static void slowdown(Entity en) {
         double dist;
         Module reach = Raven.moduleManager.getModuleByClazz(Reach.class);
         if (c.isToggled() && reach != null && reach.isEnabled() && !mc.thePlayer.capabilities.isCreativeMode) {
@@ -37,17 +37,14 @@ public class KeepSprint extends Module {
             mc.thePlayer.motionX *= val;
             mc.thePlayer.motionZ *= val;
 
-            if (sprint.isToggled()) {
-                mc.thePlayer.setSprinting(false);
-            }
         } else {
             dist = (100.0D - (double) ((float) b.getInput())) / 100.0D;
             mc.thePlayer.motionX *= dist;
             mc.thePlayer.motionZ *= dist;
 
-            if (sprint.isToggled()) {
-                mc.thePlayer.setSprinting(false);
-            }
+        }
+        if (sprint.isToggled()) {
+            mc.thePlayer.setSprinting(false);
         }
 
     }

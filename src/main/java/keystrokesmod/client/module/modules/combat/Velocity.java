@@ -2,6 +2,7 @@ package keystrokesmod.client.module.modules.combat;
 
 import com.google.common.eventbus.Subscribe;
 import keystrokesmod.client.event.impl.ForgeEvent;
+import keystrokesmod.client.event.impl.PacketEvent;
 import keystrokesmod.client.module.Module;
 import keystrokesmod.client.module.setting.impl.ComboSetting;
 import keystrokesmod.client.module.setting.impl.SliderSetting;
@@ -9,17 +10,20 @@ import keystrokesmod.client.module.setting.impl.TickSetting;
 import keystrokesmod.client.utils.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
+import net.minecraft.network.play.server.S27PacketExplosion;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import org.lwjgl.input.Keyboard;
 
 public class Velocity extends Module {
     public static SliderSetting a, b, c, ap, bp, cp, dt;
     public static TickSetting d, e, f;
-    public static ComboSetting g;
+    public static ComboSetting g, veloMode;
     public Mode mode = Mode.Distance;
 
     public Velocity() {
         super("Velocity", ModuleCategory.combat);
+        this.registerSetting(veloMode = new ComboSetting<VeloMode>("Mode", VeloMode.Old));
         this.registerSetting(a = new SliderSetting("Horizontal", 90.0D, -100.0D, 100.0D, 1.0D));
         this.registerSetting(b = new SliderSetting("Vertical", 100.0D, -100.0D, 100.0D, 1.0D));
         this.registerSetting(c = new SliderSetting("Chance", 100.0D, 0.0D, 100.0D, 1.0D));
@@ -36,6 +40,9 @@ public class Velocity extends Module {
     @Subscribe
     public void onLivingUpdate(ForgeEvent fe) {
         if (fe.getEvent() instanceof LivingUpdateEvent) {
+            if(veloMode.getMode() != VeloMode.Old)
+                return;
+
             if (Utils.Player.isPlayerInGame() && mc.thePlayer.maxHurtTime > 0
                     && mc.thePlayer.hurtTime == mc.thePlayer.maxHurtTime) {
                 if (d.isToggled() && (mc.objectMouseOver == null || mc.objectMouseOver.entityHit == null)) {
@@ -78,6 +85,16 @@ public class Velocity extends Module {
         }
     }
 
+    @Subscribe
+    public void onPacket(PacketEvent e) {
+        if(veloMode.getMode() != VeloMode.Cancel)
+            return;
+
+        if(e.getPacket() instanceof S12PacketEntityVelocity) {
+            e.cancel();
+        }
+    }
+
     public void velo() {
         if (cp.getInput() != 100.0D) {
             double ch = Math.random();
@@ -98,5 +115,9 @@ public class Velocity extends Module {
 
     public enum Mode {
         Distance, ItemHeld
+    }
+
+    public enum VeloMode {
+        Old, Cancel
     }
 }

@@ -25,7 +25,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.item.*;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -58,19 +62,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.ContainerPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemAxe;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemEgg;
-import net.minecraft.item.ItemEnderEye;
-import net.minecraft.item.ItemEnderPearl;
-import net.minecraft.item.ItemExpBottle;
-import net.minecraft.item.ItemPotion;
-import net.minecraft.item.ItemSnowball;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C03PacketPlayer.C05PacketPlayerLook;
 import net.minecraft.potion.Potion;
 import net.minecraft.scoreboard.Score;
@@ -97,11 +89,84 @@ public class Utils {
     public static class Player {
         
         public static boolean isPlayerInChest() {
-            return mc.currentScreen != null && mc.thePlayer.inventoryContainer != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayer && mc.currentScreen instanceof GuiChest;
+            return mc.currentScreen != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayer && mc.currentScreen instanceof GuiChest;
         }
         
         public static boolean isPlayerInInventory() {
-            return mc.currentScreen != null && mc.thePlayer.inventoryContainer != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayer && mc.currentScreen instanceof GuiInventory;
+            return mc.currentScreen != null && mc.thePlayer.inventoryContainer instanceof ContainerPlayer && mc.currentScreen instanceof GuiInventory;
+        }
+
+        public static float[] getRotationsToEntity(Entity entity) {
+            double xDif = entity.posX - mc.thePlayer.posX;
+            double zDif = entity.posZ - mc.thePlayer.posZ;
+
+            AxisAlignedBB entityBB = entity.getEntityBoundingBox().expand(0.1F, 0.1F, 0.1F);
+            double playerEyePos = (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
+            double yDif = playerEyePos > entityBB.maxY ? entityBB.maxY - playerEyePos : // Higher than max, aim at max
+                    playerEyePos < entityBB.minY ? entityBB.minY - playerEyePos : // Lower than min, aim at min
+                            0; // Else aim straight
+
+            double fDist = MathHelper.sqrt_double(xDif * xDif + zDif * zDif);
+
+            return new float[]{
+                    (float) (StrictMath.atan2(zDif, xDif) * (180.0D / StrictMath.PI)) - 90.0F,
+                    (float) (-(StrictMath.atan2(yDif, fDist) * (180.0D / StrictMath.PI)))
+            };
+        }
+
+
+        public static double getTotalArmorProtection(EntityPlayer player) {
+            double totalArmor = 0;
+            for (int i = 0; i < 4; i++) {
+                ItemStack armorStack = player.getCurrentArmor(i);
+
+                if (armorStack != null && armorStack.getItem() instanceof ItemArmor) {
+                    totalArmor += getDamageReduction(armorStack);
+                }
+            }
+
+            return totalArmor;
+        }
+
+        public static double getDamageReduction(ItemStack stack) {
+            double reduction = 0.0;
+
+            ItemArmor armor = (ItemArmor) stack.getItem();
+
+            reduction += armor.damageReduceAmount;
+
+            if (stack.isItemEnchanted())
+                reduction += EnchantmentHelper.getEnchantmentLevel(Enchantment.protection.effectId, stack) * 0.25D;
+
+            return reduction;
+        }
+
+        public static List<EntityLivingBase> getLivingEntities(Predicate<EntityLivingBase> validator) {
+            List<EntityLivingBase> entities = new ArrayList<>();
+
+            for (Entity entity : mc.theWorld.loadedEntityList) {
+                if (entity instanceof EntityLivingBase) {
+                    EntityLivingBase e = (EntityLivingBase) entity;
+                    if (validator.test(e))
+                        entities.add(e);
+                }
+            }
+
+            return entities;
+        }
+
+        public static float getYawToEntity(Entity entity) {
+            EntityPlayerSP player = mc.thePlayer;
+            return getYawBetween(player.rotationYaw,
+                    player.posX, player.posZ,
+                    entity.posX, entity.posZ);
+        }
+
+        public static float getYawBetween(float yaw, double srcX, double srcZ, double destX, double destZ) {
+            double xDist = destX - srcX;
+            double zDist = destZ - srcZ;
+            float var1 = (float) (StrictMath.atan2(zDist, xDist) * 180.0D / Math.PI) - 90.0F;
+            return yaw + MathHelper.wrapAngleTo180_float(var1 - yaw);
         }
 
         public static MovingObjectPosition rayTrace(double reach, float partialTicks) {
@@ -352,6 +417,7 @@ public class Utils {
             return Mouse.isButtonDown(0) && Mouse.isButtonDown(1);
         }
 
+        // i have several questions about who did this
         public static float[] getTargetRotations(Entity q) {
             if (q == null) {
                 return null;

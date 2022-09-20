@@ -22,7 +22,7 @@ import keystrokesmod.client.module.modules.combat.DelayRemover;
 import keystrokesmod.client.module.modules.combat.HitBox;
 import keystrokesmod.client.module.modules.combat.JumpReset;
 import keystrokesmod.client.module.modules.combat.LeftClicker;
-import keystrokesmod.client.module.modules.combat.LegitAura2;
+import keystrokesmod.client.module.modules.combat.KvAura;
 import keystrokesmod.client.module.modules.combat.Reach;
 import keystrokesmod.client.module.modules.combat.STap;
 import keystrokesmod.client.module.modules.combat.ShiftTap;
@@ -178,7 +178,7 @@ public class ModuleManager {
         addModule(new Parkour());
         addModule(new Disabler());
         addModule(new JumpReset());
-        addModule(new LegitAura2());
+        addModule(new KvAura());
         //addModule(new SpeedTest());
         //addModule(new LegitAura());
         //addModule(new TargetHUD());

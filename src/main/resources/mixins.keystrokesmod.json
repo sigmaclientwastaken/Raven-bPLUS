@@ -16,6 +16,7 @@
         "MixinNetworkManager"
     ],
     "client": [
+        "IC0DPacketCloseWindow",
         "IMinecraft",
         "MixinGuiScreen"
     ]

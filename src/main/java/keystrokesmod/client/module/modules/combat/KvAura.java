@@ -28,21 +28,23 @@ import java.awt.*;
 
 // todo smoother rotations when exiting range
 // uh there was one other thing as well
-public class LegitAura2 extends Module {
+public class KvAura extends Module {
+
+    // todo recode this entire module
 
     private EntityPlayer target;
     public DoubleSliderSetting reach;
-    private SliderSetting rotationDistance, fov;
-    private DoubleSliderSetting cps;
-    private TickSetting disableOnTp, disableWhenFlying, mouseDown, onlySurvival;
+    private final SliderSetting rotationDistance, fov;
+    private final DoubleSliderSetting cps;
+    private final TickSetting disableOnTp, disableWhenFlying, mouseDown, onlySurvival, correctStrafe;
     private CoolDown coolDown = new CoolDown(1);
     private boolean leftDown, leftn;
     private long leftDownTime, leftUpTime, leftk, leftl;
     private float yaw, pitch;
     private double leftm;
 
-    public LegitAura2() {
-        super("Aura", ModuleCategory.combat);
+    public KvAura() {
+        super("KvAura", ModuleCategory.combat);
         this.registerSetting(reach = new DoubleSliderSetting("Reach (Blocks)", 3.1, 3.3, 3, 6, 0.05));
         this.registerSetting(rotationDistance = new SliderSetting("Rotation Range", 3.5, 3, 6, 0.05));
         this.registerSetting(cps = new DoubleSliderSetting("Left CPS", 9, 13, 1, 60, 0.5));
@@ -50,6 +52,7 @@ public class LegitAura2 extends Module {
         this.registerSetting(onlySurvival = new TickSetting("Only Survival", true));
         this.registerSetting(disableOnTp = new TickSetting("Disable after tp", true));
         this.registerSetting(disableWhenFlying = new TickSetting("Disable when flying", true));
+        this.registerSetting(correctStrafe = new TickSetting("Strafe Correctly", true));
         this.registerSetting(mouseDown = new TickSetting("Mouse Down", true));
     }
 
@@ -94,15 +97,23 @@ public class LegitAura2 extends Module {
 
     @Subscribe
     public void packetEvent(PacketEvent e) {
-        if(e.getPacket() instanceof S08PacketPlayerPosLook && mouseDown.isToggled() && coolDown.getTimeLeft() < 2000) {
-            coolDown.setCooldown(2000);
-            coolDown.start();
+        if(e.getPacket() instanceof S08PacketPlayerPosLook) {
+            if(mouseDown.isToggled()) {
+                if(coolDown.getTimeLeft() < 2000) {
+                    coolDown.setCooldown(2000);
+                    coolDown.start();
+                }
+            } else {
+                if(disableOnTp.isToggled()) {
+                    setToggled(false);
+                }
+            }
         }
     }
 
     @Subscribe
     public void move(MoveInputEvent e) {
-        if(target != null) {
+        if(target != null && correctStrafe.isToggled()) {
             e.setYaw(yaw);
         }
     }
