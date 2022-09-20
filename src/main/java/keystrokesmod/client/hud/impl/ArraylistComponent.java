@@ -1,6 +1,7 @@
 package keystrokesmod.client.hud.impl;
 
 import keystrokesmod.client.hud.HudComponent;
+import keystrokesmod.client.main.Raven;
 import keystrokesmod.client.module.modules.HUD;
 import keystrokesmod.client.utils.ColorSupplier;
 import keystrokesmod.client.utils.RenderUtils;
@@ -9,6 +10,9 @@ import keystrokesmod.client.utils.font.FontUtil;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.EnumChatFormatting;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArraylistComponent extends HudComponent {
 
@@ -51,7 +55,10 @@ public class ArraylistComponent extends HudComponent {
         if(color == null)
             return;
 
+        List<String> modules = new ArrayList<>();
+        Raven.moduleManager.getEnabledModules().forEach(module -> modules.add(module.getName()));
 
+        EnumSide side = getSide();
 
     }
 

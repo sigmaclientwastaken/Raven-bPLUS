@@ -3,6 +3,7 @@ package keystrokesmod.client.module;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import keystrokesmod.client.main.Raven;
 import keystrokesmod.client.module.Module.ModuleCategory;
@@ -219,6 +220,10 @@ public class ModuleManager {
                 return module;
         }
         return null;
+    }
+
+    public List<Module> getEnabledModules() {
+        return modules.stream().filter(Module::isEnabled).collect(Collectors.toList());
     }
 
     public List<Module> getModules() {
