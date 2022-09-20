@@ -3,6 +3,7 @@ package keystrokesmod.client.module.modules.combat;
 import java.awt.Color;
 
 import com.google.common.eventbus.Subscribe;
+import com.mojang.realmsclient.dto.RealmsServer.McoServerComparator;
 
 import keystrokesmod.client.event.impl.ForgeEvent;
 import keystrokesmod.client.event.impl.MoveInputEvent;
@@ -38,15 +39,16 @@ public class LegitAura2 extends Module {
 
     @Subscribe 
     public void onUpdate(UpdateEvent e) {
-        Entity en = Utils.Player.getClosestPlayer((float) rotationDistance.getInput());
-        target = (EntityPlayer) en;
-        if(en != null && !AntiBot.bot(en)) {
-            float[] i = Utils.Player.silentAim(en);
-            yaw = i[0];
-            pitch = i[1];
-        } else {
-            mc.thePlayer.rotationYawHead = mc.thePlayer.rotationYaw;
-            //mc.thePlayer.rotationPitch = mc.thePlayer.cameraPitch;
+        if(e.isPre()) {
+            target = (EntityPlayer) Utils.Player.getClosestPlayer((float) rotationDistance.getInput());
+            if(target != null && !AntiBot.bot(target)) {
+                float[] i = Utils.Player.getTargetRotations(target);
+                yaw = i[0];
+                pitch = i[1];
+                mc.thePlayer.setRotationYawHead(yaw);
+                e.setYaw(yaw);
+                e.setPitch(pitch);
+            }
         }
     }
 
@@ -77,6 +79,6 @@ public class LegitAura2 extends Module {
     @Subscribe
     public void move(MoveInputEvent e) {
         if(target != null)
-            e.setYaw(mc.thePlayer.prevRotationYawHead);
+            e.setYaw(yaw);
     }
 }
