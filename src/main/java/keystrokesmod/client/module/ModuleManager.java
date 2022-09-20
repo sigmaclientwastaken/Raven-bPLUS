@@ -3,7 +3,6 @@ package keystrokesmod.client.module;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import keystrokesmod.client.main.Raven;
 import keystrokesmod.client.module.Module.ModuleCategory;
@@ -60,6 +59,7 @@ import keystrokesmod.client.module.modules.other.Disabler;
 import keystrokesmod.client.module.modules.other.FakeChat;
 import keystrokesmod.client.module.modules.other.MiddleClick;
 import keystrokesmod.client.module.modules.other.NameHider;
+import keystrokesmod.client.module.modules.other.Spin;
 import keystrokesmod.client.module.modules.other.WaterBucket;
 import keystrokesmod.client.module.modules.player.AutoArmour;
 import keystrokesmod.client.module.modules.player.AutoJump;
@@ -180,6 +180,7 @@ public class ModuleManager {
         addModule(new Disabler());
         addModule(new JumpReset());
         addModule(new KvAura());
+        addModule(new Spin());
         //addModule(new SpeedTest());
         //addModule(new LegitAura());
         //addModule(new TargetHUD());
