@@ -20,5 +20,6 @@ public class Shoutout extends Command {
         print("- nighttab (website dev)");
         print("- mood (java help)");
         print("- jc (b3 b2 betta tester, very good moaner (moans very loudly in discord vcs, giving everyone emotional motivation))");
+        print("- sigmaclientwastaken (broke tlauncher compatibility, aimassist and hitboxes)");
     }
 }
