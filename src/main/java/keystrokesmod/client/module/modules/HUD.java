@@ -137,4 +137,14 @@ public class HUD extends Module {
 
     }
 
+    public static class HudFontUtils {
+
+        private final HUD hud;
+
+        public HudFontUtils(HUD hud) {
+            this.hud = hud;
+        }
+
+    }
+
 }
