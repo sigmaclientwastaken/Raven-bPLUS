@@ -1,15 +1,20 @@
 package keystrokesmod.client.utils;
 
+import java.awt.Color;
+import java.lang.reflect.Method;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import org.lwjgl.opengl.GL11;
-
-import java.awt.*;
-import java.lang.reflect.Method;
 
 public class RenderUtils {
 
@@ -17,7 +22,7 @@ public class RenderUtils {
      * it no work kv pls fix
      */
     public static int hsbRainbow(float s, float b, int offset, int seconds) {
-        float shit = (seconds*1000f)/360f;
+		float shit = (seconds * 1000f) / 360f;
         float h = 360*(((System.currentTimeMillis()+offset)%(seconds*1000f))/shit);
         return Color.HSBtoRGB(h, s, b);
     }
@@ -58,8 +63,8 @@ public class RenderUtils {
         color.getColorComponents(afloat);
         color1.getColorComponents(afloat1);
 
-        return new Color(afloat[0] * f + afloat1[0] * f1, afloat[1] * f + afloat1[1] * f1,
-                afloat[2] * f + afloat1[2] * f1);
+        return new Color((afloat[0] * f) + (afloat1[0] * f1), (afloat[1] * f) + (afloat1[1] * f1),
+                (afloat[2] * f) + (afloat1[2] * f1));
     }
 
     public static void drawImage(ResourceLocation image, float x, float y, float width, float height) {
@@ -90,9 +95,9 @@ public class RenderUtils {
             d3 = d4;
         }
 
-        float f = (float) (i >> 24 & 255) / 255.0F;
-        float f1 = (float) (i >> 16 & 255) / 255.0F;
-        float f2 = (float) (i >> 8 & 255) / 255.0F;
+        float f = (float) ((i >> 24) & 255) / 255.0F;
+        float f1 = (float) ((i >> 16) & 255) / 255.0F;
+        float f2 = (float) ((i >> 8) & 255) / 255.0F;
         float f3 = (float) (i & 255) / 255.0F;
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
@@ -113,9 +118,9 @@ public class RenderUtils {
 
     public static void drawBorderedRect(float f, float f1, float f2, float f3, float f4, int i, int j) {
         drawRect(f, f1, f2, f3, j);
-        float f5 = (float) (i >> 24 & 255) / 255.0F;
-        float f6 = (float) (i >> 16 & 255) / 255.0F;
-        float f7 = (float) (i >> 8 & 255) / 255.0F;
+        float f5 = (float) ((i >> 24) & 255) / 255.0F;
+        float f6 = (float) ((i >> 16) & 255) / 255.0F;
+        float f7 = (float) ((i >> 8) & 255) / 255.0F;
         float f8 = (float) (i & 255) / 255.0F;
 
         GL11.glEnable(GL11.GL_BLEND);
@@ -140,15 +145,15 @@ public class RenderUtils {
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
     }
-    
+
     public static void setColor(final int color) {
-        final float a = (color >> 24 & 0xFF) / 255.0f;
-        final float r = (color >> 16 & 0xFF) / 255.0f;
-        final float g = (color >> 8 & 0xFF) / 255.0f;
+        final float a = ((color >> 24) & 0xFF) / 255.0f;
+        final float r = ((color >> 16) & 0xFF) / 255.0f;
+        final float g = ((color >> 8) & 0xFF) / 255.0f;
         final float b = (color & 0xFF) / 255.0f;
         GL11.glColor4f(r, g, b, a);
     }
-    
+
     public static void drawRoundedRect(float x, float y, float x1, float y1, final float radius, final int color) {
         GL11.glPushAttrib(0);
         GL11.glScaled(0.5, 0.5, 0.5);
@@ -162,18 +167,14 @@ public class RenderUtils {
         setColor(color);
         GL11.glEnable(2848);
         GL11.glBegin(9);
-        for (int i = 0; i <= 90; i += 3) {
-            GL11.glVertex2d(x + radius + Math.sin(i * 3.141592653589793 / 180.0) * radius * -1.0, y + radius + Math.cos(i * 3.141592653589793 / 180.0) * radius * -1.0);
-        }
-        for (int i = 90; i <= 180; i += 3) {
-            GL11.glVertex2d(x + radius + Math.sin(i * 3.141592653589793 / 180.0) * radius * -1.0, y1 - radius + Math.cos(i * 3.141592653589793 / 180.0) * radius * -1.0);
-        }
-        for (int i = 0; i <= 90; i += 3) {
-            GL11.glVertex2d(x1 - radius + Math.sin(i * 3.141592653589793 / 180.0) * radius, y1 - radius + Math.cos(i * 3.141592653589793 / 180.0) * radius);
-        }
-        for (int i = 90; i <= 180; i += 3) {
-            GL11.glVertex2d(x1 - radius + Math.sin(i * 3.141592653589793 / 180.0) * radius, y + radius + Math.cos(i * 3.141592653589793 / 180.0) * radius);
-        }
+        for (int i = 0; i <= 90; i += 3)
+			GL11.glVertex2d(x + radius + (Math.sin((i * 3.141592653589793) / 180.0) * radius * -1.0), y + radius + (Math.cos((i * 3.141592653589793) / 180.0) * radius * -1.0));
+        for (int i = 90; i <= 180; i += 3)
+			GL11.glVertex2d(x + radius + (Math.sin((i * 3.141592653589793) / 180.0) * radius * -1.0), (y1 - radius) + (Math.cos((i * 3.141592653589793) / 180.0) * radius * -1.0));
+        for (int i = 0; i <= 90; i += 3)
+			GL11.glVertex2d((x1 - radius) + (Math.sin((i * 3.141592653589793) / 180.0) * radius), (y1 - radius) + (Math.cos((i * 3.141592653589793) / 180.0) * radius));
+        for (int i = 90; i <= 180; i += 3)
+			GL11.glVertex2d((x1 - radius) + (Math.sin((i * 3.141592653589793) / 180.0) * radius), y + radius + (Math.cos((i * 3.141592653589793) / 180.0) * radius));
         GL11.glEnd();
         GL11.glEnable(3553);
         GL11.glDisable(3042);
@@ -185,7 +186,7 @@ public class RenderUtils {
         GL11.glPopAttrib();
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
     }
-    
+
     public static void drawRoundedOutline(float x, float y, float x1, float y1, final float radius, final float lineWidth, final int color) {
         GL11.glPushAttrib(0);
         GL11.glScaled(0.5, 0.5, 0.5);
@@ -199,18 +200,14 @@ public class RenderUtils {
         GL11.glEnable(2848);
         GL11.glLineWidth(lineWidth);
         GL11.glBegin(2);
-        for (int i = 0; i <= 90; i += 3) {
-            GL11.glVertex2d(x + radius + Math.sin(i * 3.141592653589793 / 180.0) * radius * -1.0, y + radius + Math.cos(i * 3.141592653589793 / 180.0) * radius * -1.0);
-        }
-        for (int i = 90; i <= 180; i += 3) {
-            GL11.glVertex2d(x + radius + Math.sin(i * 3.141592653589793 / 180.0) * radius * -1.0, y1 - radius + Math.cos(i * 3.141592653589793 / 180.0) * radius * -1.0);
-        }
-        for (int i = 0; i <= 90; i += 3) {
-            GL11.glVertex2d(x1 - radius + Math.sin(i * 3.141592653589793 / 180.0) * radius, y1 - radius + Math.cos(i * 3.141592653589793 / 180.0) * radius);
-        }
-        for (int i = 90; i <= 180; i += 3) {
-            GL11.glVertex2d(x1 - radius + Math.sin(i * 3.141592653589793 / 180.0) * radius, y + radius + Math.cos(i * 3.141592653589793 / 180.0) * radius);
-        }
+        for (int i = 0; i <= 90; i += 3)
+			GL11.glVertex2d(x + radius + (Math.sin((i * 3.141592653589793) / 180.0) * radius * -1.0), y + radius + (Math.cos((i * 3.141592653589793) / 180.0) * radius * -1.0));
+        for (int i = 90; i <= 180; i += 3)
+			GL11.glVertex2d(x + radius + (Math.sin((i * 3.141592653589793) / 180.0) * radius * -1.0), (y1 - radius) + (Math.cos((i * 3.141592653589793) / 180.0) * radius * -1.0));
+        for (int i = 0; i <= 90; i += 3)
+			GL11.glVertex2d((x1 - radius) + (Math.sin((i * 3.141592653589793) / 180.0) * radius), (y1 - radius) + (Math.cos((i * 3.141592653589793) / 180.0) * radius));
+        for (int i = 90; i <= 180; i += 3)
+			GL11.glVertex2d((x1 - radius) + (Math.sin((i * 3.141592653589793) / 180.0) * radius), y + radius + (Math.cos((i * 3.141592653589793) / 180.0) * radius));
         GL11.glEnd();
         GL11.glEnable(3553);
         GL11.glDisable(3042);
