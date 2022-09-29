@@ -34,7 +34,7 @@ public class StaticCape extends AbstractCape {
     @Override
     public void loadTexture(AbstractClientPlayer player) {
         ResourceLocation location = this.getLocation();
-        player.func_152121_a(MinecraftProfileTexture.Type.CAPE, location);
+        // player.(MinecraftProfileTexture.Type.CAPE, location);
 
         Minecraft.getMinecraft().renderEngine.loadTexture(location, this.getTexture());
     }

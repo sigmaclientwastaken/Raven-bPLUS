@@ -19,7 +19,7 @@ import net.minecraftforge.client.event.RenderPlayerEvent;
  */
 public class RenderEventHandler {
 
-    @SubscribeEvent
+    // @Subscribe
     public void renderPlayer(RenderPlayerEvent.Specials.Pre event) {
         AbstractClientPlayer player = (AbstractClientPlayer) event.entityPlayer;
 

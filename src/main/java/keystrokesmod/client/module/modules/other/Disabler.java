@@ -41,9 +41,9 @@ public class Disabler extends Module {
         this.registerSetting(mmcSafeDelay = new DoubleSliderSetting("MMCSafe Delay", 77, 80, 10, 200, 1));
         this.registerSetting(new DescriptionSetting("    "));
         this.registerSettings(
-                new DescriptionSetting("InvMove bypass, might flag."),
+                new DescriptionSetting("Possible InvMove bypass."),
                 hypSilentInv = new TickSetting("Hypixel Silent Inv", false),
-                new DescriptionSetting("have this on."),
+                new DescriptionSetting("Have this on."),
                 hypSprintFix = new TickSetting("Hypixel Sprint Fix", true)
         );
 
@@ -104,12 +104,25 @@ public class Disabler extends Module {
                             e.cancel();
 
                             if(idfk) {
-                                PacketUtils.sendPacketSilent(new C0BPacketEntityAction());
+                                PacketUtils.sendPacketSilent(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
+                            }
+
+                            if(idfk2) {
+                                PacketUtils.sendPacketSilent(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SNEAKING));
                             }
 
                             PacketUtils.sendPacketSilent(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
                             PacketUtils.sendPacketSilent(e.getPacket());
                             PacketUtils.sendPacketSilent(new C0DPacketCloseWindow(mc.thePlayer.inventoryContainer.windowId));
+
+                            if(idfk) {
+                                PacketUtils.sendPacketSilent(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
+                            }
+
+                            if(idfk2) {
+                                PacketUtils.sendPacketSilent(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SNEAKING));
+                            }
+
                         }
                     }
                 }

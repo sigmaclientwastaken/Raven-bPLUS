@@ -1,15 +1,12 @@
 package keystrokesmod.client.module.modules.combat;
 
-/**
 import com.google.common.eventbus.Subscribe;
 import keystrokesmod.client.event.impl.PacketEvent;
 import keystrokesmod.client.event.impl.UpdateEvent;
 import keystrokesmod.client.main.Raven;
 import keystrokesmod.client.module.Module;
 import keystrokesmod.client.module.modules.movement.KeepSprint;
-import keystrokesmod.client.module.setting.impl.ComboSetting;
-import keystrokesmod.client.module.setting.impl.DescriptionSetting;
-import keystrokesmod.client.module.setting.impl.DoubleSliderSetting;
+import keystrokesmod.client.module.setting.impl.*;
 import keystrokesmod.client.utils.MillisTimer;
 import keystrokesmod.client.utils.PacketUtils;
 import keystrokesmod.client.utils.Utils;
@@ -31,7 +28,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
- */
 
 /**
  * The real shit. (this is blatant aura)
@@ -44,6 +40,8 @@ public class Aura extends Module {
     public static DoubleSliderSetting reach, aps;
     public static ComboSetting<SortingMethod> sortingMode;
     public static ComboSetting<AutoBlock> autoblockMode;
+    public static SliderSetting fov;
+    public static TickSetting fovCheck;
 
     int waitTicks;
     MillisTimer attackTimer = new MillisTimer();
@@ -66,7 +64,9 @@ public class Aura extends Module {
         registerSettings(
                 aps = new DoubleSliderSetting("APS", 6, 8, 1, 20, 0.1),
                 reachDesc = new DescriptionSetting("Min: Attack | Max: Target"),
-                reach = new DoubleSliderSetting("Reach", 3, 3.3, 3, 8, 0.1)
+                reach = new DoubleSliderSetting("Reach", 3, 3.3, 3, 8, 0.1),
+                fovCheck = new TickSetting("FOV Check", false),
+                fov = new SliderSetting("FOV", 90, 0, 180, 1)
         );
 
         instance = this;
@@ -223,7 +223,7 @@ public class Aura extends Module {
     }
 
     private boolean isLookingAtEntity(final float yaw, final float pitch) {
-        double range = this.rangeProperty.getValue();
+        double range = reach.getInputMin();
         Vec3 src = mc.thePlayer.getPositionEyes(1.0F);
         final Vec3 rotationVec = getVectorForRotation(pitch, yaw);
         Vec3 dest = src.addVector(rotationVec.xCoord * range, rotationVec.yCoord * range, rotationVec.zCoord * range);
@@ -290,7 +290,7 @@ public class Aura extends Module {
     }
 
     private boolean isHoldingSword() {
-        final ItemStack stack;
+        ItemStack stack;
         return (stack = mc.thePlayer.getCurrentEquippedItem()) != null && stack.getItem() instanceof ItemSword;
     }
 
@@ -324,7 +324,7 @@ public class Aura extends Module {
         }
 
         return this.computeData(entity).dist <
-                Math.max(this.blockRangeProperty.getValue(), this.rangeProperty.getValue()) &&
+                Math.max(reach.getInputMax(), reach.getInputMin()) &&
                 (!this.checksProperty.isSelected(Checks.FOV) || this.fovCheck(entity, this.fovProperty.getValue().intValue()));
     }
 
@@ -438,8 +438,8 @@ public class Aura extends Module {
         @Override
         public int compare(EntityLivingBase o1, EntityLivingBase o2) {
             return Integer.compare(
-                    EntityLivingBase.MAX_HURT_RESISTANT_TIME - o2.hurtResistantTime,
-                    EntityLivingBase.MAX_HURT_RESISTANT_TIME - o1.hurtResistantTime);
+                    20 - o2.hurtResistantTime,
+                    20 - o1.hurtResistantTime);
         }
     }
 
@@ -471,4 +471,5 @@ public class Aura extends Module {
     }
 
 }
-*/
+
+ */

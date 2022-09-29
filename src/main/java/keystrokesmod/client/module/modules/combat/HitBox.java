@@ -34,11 +34,12 @@ public class HitBox extends Module {
 
     public HitBox() {
         super("HitBox", ModuleCategory.combat);
-        this.registerSetting(new DescriptionSetting("Temporarily don't work due to issues."));
-        this.registerSetting(a = new SliderSetting("Multiplier", 1.2D, 1.0D, 5.0D, 0.05D));
-        this.registerSetting(b = new TickSetting("Show new hitbox", false));
+        this.registerSetting(new DescriptionSetting("Changed from multiplier to extra blocks!"));
+        this.registerSetting(a = new SliderSetting("Extra Blocks", 0.2D, 0.05D, 2.0D, 0.05D));
+        this.registerSetting(b = new TickSetting("Vertical", false));
     }
 
+    /*
     @Subscribe
     public void onRenderWorldLast(ForgeEvent fe) {
         if (fe.getEvent() instanceof RenderWorldLastEvent) {
@@ -53,9 +54,11 @@ public class HitBox extends Module {
         }
     }
 
+     */
+
     public static double exp(Entity en) {
         Module hitBox = Raven.moduleManager.getModuleByClazz(HitBox.class);
-        return (hitBox != null && hitBox.isEnabled() && !AntiBot.bot(en)) ? a.getInput() : 1.0D;
+        return (hitBox != null && hitBox.isEnabled() && !AntiBot.bot(en)) ? a.getInput() : 0D;
     }
 
     private void rh(Entity e, Color c) {
