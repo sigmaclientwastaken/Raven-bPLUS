@@ -1,96 +1,33 @@
 package keystrokesmod.client.module;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import keystrokesmod.client.main.Raven;
 import keystrokesmod.client.module.Module.ModuleCategory;
 import keystrokesmod.client.module.modules.HUD;
-import keystrokesmod.client.module.modules.client.FPSSpoofer;
-import keystrokesmod.client.module.modules.client.FakeHud;
 import keystrokesmod.client.module.modules.client.GuiModule;
-import keystrokesmod.client.module.modules.client.SelfDestruct;
-import keystrokesmod.client.module.modules.client.Terminal;
-import keystrokesmod.client.module.modules.client.UpdateCheck;
-import keystrokesmod.client.module.modules.combat.AimAssist;
-import keystrokesmod.client.module.modules.combat.AutoBlock;
-import keystrokesmod.client.module.modules.combat.AutoWeapon;
-import keystrokesmod.client.module.modules.combat.BlockHit;
-import keystrokesmod.client.module.modules.combat.ClickAssist;
-import keystrokesmod.client.module.modules.combat.DelayRemover;
-import keystrokesmod.client.module.modules.combat.HitBox;
-import keystrokesmod.client.module.modules.combat.JumpReset;
-import keystrokesmod.client.module.modules.combat.LeftClicker;
-import keystrokesmod.client.module.modules.combat.KvAura;
-import keystrokesmod.client.module.modules.combat.Reach;
-import keystrokesmod.client.module.modules.combat.STap;
-import keystrokesmod.client.module.modules.combat.ShiftTap;
-import keystrokesmod.client.module.modules.combat.Velocity;
-import keystrokesmod.client.module.modules.combat.WTap;
+import keystrokesmod.client.module.modules.client.*;
+import keystrokesmod.client.module.modules.combat.*;
 import keystrokesmod.client.module.modules.config.ConfigSettings;
-import keystrokesmod.client.module.modules.hotkey.Armour;
-import keystrokesmod.client.module.modules.hotkey.Blocks;
-import keystrokesmod.client.module.modules.hotkey.Healing;
-import keystrokesmod.client.module.modules.hotkey.Ladders;
-import keystrokesmod.client.module.modules.hotkey.Pearl;
-import keystrokesmod.client.module.modules.hotkey.Trajectories;
-import keystrokesmod.client.module.modules.hotkey.Weapon;
-import keystrokesmod.client.module.modules.minigames.BedwarsOverlay;
-import keystrokesmod.client.module.modules.minigames.BridgeInfo;
-import keystrokesmod.client.module.modules.minigames.DuelsStats;
-import keystrokesmod.client.module.modules.minigames.MurderMystery;
-import keystrokesmod.client.module.modules.minigames.SumoFences;
+import keystrokesmod.client.module.modules.hotkey.*;
+import keystrokesmod.client.module.modules.minigames.*;
 import keystrokesmod.client.module.modules.minigames.Sumo.SumoBot;
 import keystrokesmod.client.module.modules.minigames.Sumo.SumoClicker;
-import keystrokesmod.client.module.modules.movement.AutoHeader;
-import keystrokesmod.client.module.modules.movement.Boost;
-import keystrokesmod.client.module.modules.movement.Fly;
-import keystrokesmod.client.module.modules.movement.InvMove;
-import keystrokesmod.client.module.modules.movement.KeepSprint;
-import keystrokesmod.client.module.modules.movement.LegitSpeed;
-import keystrokesmod.client.module.modules.movement.NoSlow;
-import keystrokesmod.client.module.modules.movement.SlyPort;
-import keystrokesmod.client.module.modules.movement.Sprint;
-import keystrokesmod.client.module.modules.movement.StopMotion;
-import keystrokesmod.client.module.modules.movement.Timer;
-import keystrokesmod.client.module.modules.movement.VClip;
-import keystrokesmod.client.module.modules.other.Disabler;
-import keystrokesmod.client.module.modules.other.FakeChat;
-import keystrokesmod.client.module.modules.other.MiddleClick;
-import keystrokesmod.client.module.modules.other.NameHider;
-import keystrokesmod.client.module.modules.other.Spin;
-import keystrokesmod.client.module.modules.other.WaterBucket;
-import keystrokesmod.client.module.modules.player.AutoArmour;
-import keystrokesmod.client.module.modules.player.AutoJump;
-import keystrokesmod.client.module.modules.player.AutoPlace;
-import keystrokesmod.client.module.modules.player.AutoTool;
-import keystrokesmod.client.module.modules.player.BedAura;
-import keystrokesmod.client.module.modules.player.BridgeAssist;
-import keystrokesmod.client.module.modules.player.ChestStealer;
-import keystrokesmod.client.module.modules.player.FallSpeed;
-import keystrokesmod.client.module.modules.player.FastPlace;
-import keystrokesmod.client.module.modules.player.Freecam;
-import keystrokesmod.client.module.modules.player.NoFall;
-import keystrokesmod.client.module.modules.player.Parkour;
-import keystrokesmod.client.module.modules.player.RightClicker;
-import keystrokesmod.client.module.modules.player.SafeWalk;
-import keystrokesmod.client.module.modules.render.AntiShuffle;
-import keystrokesmod.client.module.modules.render.Chams;
-import keystrokesmod.client.module.modules.render.ChestESP;
-import keystrokesmod.client.module.modules.render.Fullbright;
-import keystrokesmod.client.module.modules.render.Nametags;
-import keystrokesmod.client.module.modules.render.PlayerESP;
-import keystrokesmod.client.module.modules.render.Projectiles;
-import keystrokesmod.client.module.modules.render.Tracers;
+import keystrokesmod.client.module.modules.movement.*;
+import keystrokesmod.client.module.modules.other.*;
+import keystrokesmod.client.module.modules.player.*;
+import keystrokesmod.client.module.modules.render.*;
 import keystrokesmod.client.module.modules.world.AntiBot;
 import keystrokesmod.client.module.modules.world.ChatLogger;
-import keystrokesmod.client.utils.Utils;
+import keystrokesmod.client.module.modules.world.Scaffold;
 import net.minecraft.client.gui.FontRenderer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public class ModuleManager {
-    private List<Module> modules = new ArrayList<>();
+    private Map<Class<? extends Module>, Module> modules = new HashMap<>();
 
     public static boolean initialized;
     public GuiModuleManager guiModuleManager;
@@ -182,6 +119,7 @@ public class ModuleManager {
         addModule(new JumpReset());
         addModule(new KvAura());
         addModule(new Spin());
+        addModule(new Scaffold());
         //addModule(new SpeedTest());
         //addModule(new LegitAura());
         //addModule(new TargetHUD());
@@ -191,12 +129,12 @@ public class ModuleManager {
     }
 
     public void addModule(Module m) {
-        modules.add(m);
+        modules.put(m.getClass(), m);
     }
 
     public void removeModuleByName(String s) {
         Module m = getModuleByName(s);
-        modules.remove(m);
+        modules.remove(m.getClass());
         m.component.category.r3nd3r();
     }
 
@@ -206,7 +144,7 @@ public class ModuleManager {
         if (!initialized)
             return null;
 
-        for (Module module : modules) {
+        for (Module module : modules.values()) {
             if (module.getName().replaceAll(" ", "").equalsIgnoreCase(name) || module.getName().equalsIgnoreCase(name))
                 return module;
         }
@@ -217,19 +155,15 @@ public class ModuleManager {
         if (!initialized)
             return null;
 
-        for (Module module : modules) {
-            if (module.getClass().equals(c))
-                return module;
-        }
-        return null;
+        return modules.get(c);
     }
 
     public List<Module> getEnabledModules() {
-        return modules.stream().filter(Module::isEnabled).collect(Collectors.toList());
+        return modules.values().stream().filter(Module::isEnabled).collect(Collectors.toList());
     }
 
     public List<Module> getModules() {
-        ArrayList<Module> allModules = new ArrayList<>(modules);
+        ArrayList<Module> allModules = new ArrayList<>(modules.values());
         try {
             allModules.addAll(Raven.configManager.configModuleManager.getConfigModules());
         } catch (NullPointerException ignored) {
@@ -277,27 +211,13 @@ public class ModuleManager {
         return modulesOfCat;
     }
 
-    public void sort() {
-        modules.sort((o1, o2) -> Utils.mc.fontRendererObj.getStringWidth(o2.getName())
-                - Utils.mc.fontRendererObj.getStringWidth(o1.getName()));
-    }
-
     public int numberOfModules() {
         return modules.size();
     }
 
-    public void sortLongShort() {
-        modules.sort(Comparator.comparingInt(o2 -> Utils.mc.fontRendererObj.getStringWidth(o2.getName())));
-    }
-
-    public void sortShortLong() {
-        modules.sort((o1, o2) -> Utils.mc.fontRendererObj.getStringWidth(o2.getName())
-                - Utils.mc.fontRendererObj.getStringWidth(o1.getName()));
-    }
-
     public int getLongestActiveModule(FontRenderer fr) {
         int length = 0;
-        for (Module mod : modules) {
+        for (Module mod : modules.values()) {
             if (mod.isEnabled()) {
                 if (fr.getStringWidth(mod.getName()) > length) {
                     length = fr.getStringWidth(mod.getName());
@@ -309,7 +229,7 @@ public class ModuleManager {
 
     public int getBoxHeight(FontRenderer fr, int margin) {
         int length = 0;
-        for (Module mod : modules) {
+        for (Module mod : modules.values()) {
             if (mod.isEnabled()) {
                 length += fr.FONT_HEIGHT + margin;
             }

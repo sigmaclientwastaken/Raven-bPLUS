@@ -1,9 +1,11 @@
 package keystrokesmod.client.mixin.mixins;
 
+import keystrokesmod.client.event.impl.MoveEvent;
 import keystrokesmod.client.event.impl.MoveInputEvent;
 import keystrokesmod.client.main.Raven;
 import keystrokesmod.client.module.Module;
 import keystrokesmod.client.module.modules.player.SafeWalk;
+import keystrokesmod.client.module.modules.world.Scaffold;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -21,7 +23,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
-import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -136,6 +137,17 @@ public abstract class MixinEntity {
      */
     @Overwrite
     public void moveEntity(double p_moveEntity_1_, double p_moveEntity_3_, double p_moveEntity_5_) {
+
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if ((Object) this == mc.thePlayer) {
+            MoveEvent e = new MoveEvent(p_moveEntity_1_, p_moveEntity_3_, p_moveEntity_5_);
+            Raven.eventBus.post(e);
+            p_moveEntity_1_ = e.getX();
+            p_moveEntity_3_ = e.getY();
+            p_moveEntity_5_ = e.getZ();
+        }
+
         if (this.noClip) {
             this.setEntityBoundingBox(
                     this.getEntityBoundingBox().offset(p_moveEntity_1_, p_moveEntity_3_, p_moveEntity_5_));
@@ -161,10 +173,9 @@ public abstract class MixinEntity {
             boolean flag; // = this.onGround && this.isSneaking() && ((Entity) ((Object) this)) instanceof
                           // EntityPlayer;
 
-            Minecraft mc = Minecraft.getMinecraft();
-
             if ((Object) this == mc.thePlayer && mc.thePlayer.onGround) {
                 Module safeWalk = Raven.moduleManager.getModuleByClazz(SafeWalk.class);
+                Module scaffold = Raven.moduleManager.getModuleByClazz(Scaffold.class);
 
                 if (safeWalk != null && safeWalk.isEnabled() && !SafeWalk.doShift.isToggled()) {
                     flag = true;
@@ -194,6 +205,11 @@ public abstract class MixinEntity {
                 } else {
                     flag = mc.thePlayer.isSneaking();
                 }
+
+                if(scaffold != null && Scaffold.safewalk()) {
+                    flag = true;
+                }
+
             } else {
                 flag = false;
             }

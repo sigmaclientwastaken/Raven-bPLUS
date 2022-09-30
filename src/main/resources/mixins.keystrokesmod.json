@@ -4,6 +4,8 @@
     "refmap": "mixins.keystrokesmod.refmap.json",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
+        "IItemBucket",
+        "IItemTool",
         "MixinC03PacketPlayer",
         "MixinEntity",
         "MixinEntityPlayer",
@@ -18,6 +20,8 @@
     "client": [
         "IC0DPacketCloseWindow",
         "IMinecraft",
-        "MixinGuiScreen"
+        "MixinGuiIngame",
+        "MixinGuiScreen",
+        "MixinGuiSpectator"
     ]
 }

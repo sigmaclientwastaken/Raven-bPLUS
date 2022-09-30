@@ -1,20 +1,16 @@
 package keystrokesmod.client.utils;
 
-import java.awt.Color;
-import java.lang.reflect.Method;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.lang.reflect.Method;
 
 public class RenderUtils {
 
@@ -219,4 +215,18 @@ public class RenderUtils {
         GL11.glLineWidth(1.0f);
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
     }
+
+    public static void drawOutlinedString(String text, int x, int y, int color, int outlineColor) {
+        FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
+        fr.drawString(text, x + 1, y, outlineColor);
+        fr.drawString(text, x - 1, y, outlineColor);
+        fr.drawString(text, x, y + 1, outlineColor);
+        fr.drawString(text, x, y - 1, outlineColor);
+        fr.drawString(text, x, y, color);
+    }
+
+    public static void drawOutlinedString(String text, int x, int y, int color) {
+        drawOutlinedString(text, x, y, color, 0);
+    }
+
 }
