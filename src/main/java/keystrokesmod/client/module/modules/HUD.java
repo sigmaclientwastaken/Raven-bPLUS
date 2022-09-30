@@ -1,22 +1,27 @@
 package keystrokesmod.client.module.modules;
 
+import static net.minecraft.util.EnumChatFormatting.GRAY;
+import static net.minecraft.util.EnumChatFormatting.RED;
+import static net.minecraft.util.EnumChatFormatting.RESET;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.common.eventbus.Subscribe;
+
 import keystrokesmod.client.event.impl.Render2DEvent;
 import keystrokesmod.client.hud.HudComponent;
 import keystrokesmod.client.hud.impl.WatermarkComponent;
 import keystrokesmod.client.module.Module;
-import keystrokesmod.client.module.setting.impl.*;
+import keystrokesmod.client.module.setting.impl.ComboSetting;
+import keystrokesmod.client.module.setting.impl.DescriptionSetting;
+import keystrokesmod.client.module.setting.impl.RGBSetting;
+import keystrokesmod.client.module.setting.impl.SliderSetting;
+import keystrokesmod.client.module.setting.impl.TickSetting;
 import keystrokesmod.client.utils.ColorSupplier;
 import keystrokesmod.client.utils.RenderUtils;
+import keystrokesmod.client.utils.Utils;
 import net.minecraft.client.renderer.GlStateManager;
-import org.fusesource.jansi.Ansi;
-
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import static net.minecraft.util.EnumChatFormatting.*;
 
 public class HUD extends Module {
     public static ComboSetting<WatermarkMode> watermarkMode;
@@ -58,8 +63,7 @@ public class HUD extends Module {
                 generalColor = new RGBSetting("Color" + RED + RESET, 107, 105, 214),
                 generalRainbowBrightness = new SliderSetting("Rainbow Brightness" + RED + RESET, 1, 0, 1, 0.01),
                 generalRainbowSaturation = new SliderSetting("Rainbow Saturation" + RED + RESET, 1, 0, 1, 0.01),
-                generalRainbowSeconds = new SliderSetting("Rainbow Seconds" + RED + RESET, 4, 1, 10, 1),
-                generalRainbowOffset = new SliderSetting("Rainbow Offset" + RED + RESET, 150, 100, 1000, 10)
+				generalRainbowOffset = new SliderSetting("Rainbow Offset" + RED + RESET, 150, 100, 1000, 10)
         );
 
         add(new WatermarkComponent());
@@ -68,12 +72,11 @@ public class HUD extends Module {
 
     @Subscribe
     public void onRender2D(Render2DEvent e) {
-        if(mc.thePlayer != null && mc.theWorld != null) {
-            comps.forEach((compC, comp) -> {
+        if((mc.thePlayer != null) && (mc.theWorld != null))
+			comps.forEach((compC, comp) -> {
                 GlStateManager.resetColor();
                 comp.draw(false);
             });
-        }
     }
 
     private void add(HudComponent comp) {
@@ -94,9 +97,8 @@ public class HUD extends Module {
     }
 
     public void updateDrag(int mouseX, int mouseY) {
-        if(dragging != null) {
-            dragging.setX(mouseX - dragX).setY(mouseY - dragY);
-        }
+        if(dragging != null)
+			dragging.setX(mouseX - dragX).setY(mouseY - dragY);
     }
 
     public void endDrag(int mouseX, int mouseY) {
@@ -105,11 +107,10 @@ public class HUD extends Module {
     }
 
     public void handleClick(int mouseX, int mouseY, int mouseButton) {
-        if(mouseButton == 0) {
-            comps.forEach((compC, comp) -> {
+        if(mouseButton == 0)
+			comps.forEach((compC, comp) -> {
                 comp.onClick(mouseX, mouseY);
             });
-        }
     }
 
     public enum WatermarkMode {
@@ -119,11 +120,11 @@ public class HUD extends Module {
     }
 
     public enum ColorMode {
-        Static((in) -> generalColor.getRGB()),
-        Fade((in) -> RenderUtils.blend(generalColor.getColor(), generalColor.getColor().darker(), in/100D).getRGB()),
-        Rainbow((in) -> RenderUtils.hsbRainbow((float) generalRainbowSaturation.getInput(),(float) generalRainbowBrightness.getInput(),
-                (int) (in * generalRainbowOffset.getInput()), (int) generalRainbowSeconds.getInput())),
-        Astolfo((in) -> -1);
+        Static(in -> generalColor.getRGB()),
+        Fade(in -> RenderUtils.blend(generalColor.getColor(), generalColor.getColor().darker(), in/100D).getRGB()),
+        Rainbow(in -> RenderUtils.hsbRainbow((float) generalRainbowSaturation.getInput(),(float) generalRainbowBrightness.getInput(),
+				(int) (in * generalRainbowOffset.getInput()), (int) System.currentTimeMillis())),
+		Astolfo(in -> Utils.Client.astolfoColorsDraw(100, 100)); // just random values lol
 
         private final ColorSupplier color;
 
