@@ -6,6 +6,7 @@ import keystrokesmod.client.event.impl.TickEvent;
 import keystrokesmod.client.event.impl.UpdateEvent;
 import keystrokesmod.client.main.Raven;
 import keystrokesmod.client.module.Module;
+import keystrokesmod.client.module.modules.combat.Aura;
 import keystrokesmod.client.module.modules.movement.NoSlow;
 import keystrokesmod.client.module.modules.movement.Sprint;
 import net.minecraft.client.Minecraft;
@@ -241,7 +242,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         float f = 0.8F;
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
-        if (this.isUsingItem() && !this.isRiding()) {
+        if ((this.isUsingItem() || Aura.doSlowdown()) && !this.isRiding()) {
 
             MovementInput var10000 = this.movementInput;
 

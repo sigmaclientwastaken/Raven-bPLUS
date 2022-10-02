@@ -11,6 +11,8 @@ import keystrokesmod.client.utils.font.FontUtil;
 import keystrokesmod.client.utils.version.Version;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,8 +20,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import org.lwjgl.input.Mouse;
 
 public class ClickGui extends GuiScreen {
     private ScheduledFuture<?> sf;
@@ -116,6 +116,7 @@ public class ClickGui extends GuiScreen {
             int rows = 1;
             for (int i = Raven.updateText.length - 1; i >= 0; i--) {
                 String up = Raven.updateText[i];
+                GlStateManager.resetColor();
                 if (GuiModule.useCustomFont()) {
                     FontUtil.normal.drawSmoothString(up, halfScreenWidth - this.fontRendererObj.getStringWidth(up) / 2,
                             this.height - this.fontRendererObj.FONT_HEIGHT * rows - margin,
@@ -130,6 +131,7 @@ public class ClickGui extends GuiScreen {
                 margin += 2;
             }
         } else {
+            GlStateManager.resetColor();
             if (GuiModule.useCustomFont()) {
                 FontUtil.normal.drawSmoothString(
                         "Raven B++ v" + clientVersion + " | Config: " + Raven.configManager.getConfig().getName(), 4,
@@ -169,6 +171,7 @@ public class ClickGui extends GuiScreen {
         }
 
         // PLAYER
+        GlStateManager.resetColor();
         GuiInventory.drawEntityOnScreen(this.width + 15 - this.aE.getValueInt(0, 40, 2),
                 this.height - 19 - this.fontRendererObj.FONT_HEIGHT, 40, (float) (this.width - 25 - x),
                 (float) (this.height - 50 - y), this.mc.thePlayer);

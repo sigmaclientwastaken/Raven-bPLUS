@@ -6,6 +6,7 @@ import keystrokesmod.client.event.impl.UpdateEvent;
 import keystrokesmod.client.main.Raven;
 import keystrokesmod.client.module.Module;
 import keystrokesmod.client.module.modules.movement.KeepSprint;
+import keystrokesmod.client.module.modules.world.AntiBot;
 import keystrokesmod.client.module.setting.impl.*;
 import keystrokesmod.client.utils.MillisTimer;
 import keystrokesmod.client.utils.PacketUtils;
@@ -31,23 +32,27 @@ import java.util.Map;
 
 /**
  * The real shit. (this is blatant aura)
- * This entire class is work in progress, do not touch/uncomment.
+ * This entire class is work in progress, do not touch.
  * @author sigmaclientwastaken, some stuff is blatantly stolen from Radium by nevalack
  */
-/*
 public class Aura extends Module {
-    public static DescriptionSetting reachDesc;
-    public static DoubleSliderSetting reach, aps;
+    public static DescriptionSetting atDesc;
+    public static DoubleSliderSetting aps;
     public static ComboSetting<SortingMethod> sortingMode;
-    public static ComboSetting<AutoBlock> autoblockMode;
-    public static SliderSetting fov;
-    public static TickSetting fovCheck;
+    public static ComboSetting<AutoBlockMode> abMode;
+    public static ComboSetting<AttackTiming> attackTimingSetting;
+    public static SliderSetting fov, attackReach, targetRange, turnSpeed;
+    public static TickSetting fovCheck, raytrace, lockView, rotCheck;
+
+    public static TickSetting targetInvisibles, targetPlayers, targetTeammates, targetMobs, targetAnimals;
 
     int waitTicks;
     MillisTimer attackTimer = new MillisTimer();
     private EntityLivingBase target;
     private boolean entityInBlockRange;
     private boolean blocking;
+
+    private float lastYaw, lastPitch;
 
     private static Aura instance;
 
@@ -59,14 +64,29 @@ public class Aura extends Module {
     };
 
     public Aura() {
-        super("Aura", ModuleCategory.combat);
+        super("KillAura", ModuleCategory.combat);
 
         registerSettings(
                 aps = new DoubleSliderSetting("APS", 6, 8, 1, 20, 0.1),
-                reachDesc = new DescriptionSetting("Min: Attack | Max: Target"),
-                reach = new DoubleSliderSetting("Reach", 3, 3.3, 3, 8, 0.1),
+                attackReach = new SliderSetting("Reach", 3, 3, 8, 0.1),
+                targetRange = new SliderSetting("Target Range", 3.3, 3, 8, 0.1),
                 fovCheck = new TickSetting("FOV Check", false),
-                fov = new SliderSetting("FOV", 90, 0, 180, 1)
+                fov = new SliderSetting("FOV", 90, 0, 180, 1),
+                abMode = new ComboSetting<>("AutoBlock", AutoBlockMode.None),
+                atDesc = new DescriptionSetting("Pre is recommended."),
+                attackTimingSetting = new ComboSetting<>("Attack Timing", AttackTiming.Pre),
+                raytrace = new TickSetting("Raytrace Check", false),
+                rotCheck = new TickSetting("Rotation Check", true),
+                turnSpeed = new SliderSetting("Rotation Speed", 45, 10, 180, 5),
+                lockView = new TickSetting("Lock View", false),
+                new DescriptionSetting("   "),
+                new DescriptionSetting("Targets:"),
+                targetInvisibles = new TickSetting("Invisibles", false),
+                targetTeammates = new TickSetting("Teammates", false),
+                targetPlayers = new TickSetting("Players", true),
+                targetMobs = new TickSetting("Mobs", false),
+                targetAnimals = new TickSetting("Animals", false),
+                sortingMode = new ComboSetting<>("Sorting", SortingMethod.Combined)
         );
 
         instance = this;
@@ -87,6 +107,7 @@ public class Aura extends Module {
         if(e.isPre()) {
             entityDataCache.clear();
 
+            boolean lastEIBR = entityInBlockRange;
             entityInBlockRange = false;
 
             EntityLivingBase optimalTarget = null;
@@ -101,10 +122,10 @@ public class Aura extends Module {
             for (EntityLivingBase entity : entities) {
                 double dist = this.computeData(entity).dist;
 
-                if (!this.entityInBlockRange && dist < reach.getInputMax())
+                if (!this.entityInBlockRange && dist < targetRange.getInput())
                     this.entityInBlockRange = true;
 
-                if (dist < reach.getInputMin()) {
+                if (dist < attackReach.getInput()) {
                     optimalTarget = entity;
                     break;
                 }
@@ -112,51 +133,38 @@ public class Aura extends Module {
 
             this.target = optimalTarget;
 
+            if(abMode.getMode() == AutoBlockMode.Vanilla) {
+                if (lastEIBR && !entityInBlockRange) {
+                    unblock();
+                    blocking = false;
+                } else if(!lastEIBR && entityInBlockRange) {
+                    block();
+                    blocking = true;
+                }
+            }
+
             if (isOccupied() || checkWaitTicks())
                 return;
 
             if (optimalTarget != null) {
 
-                RotationUtils.rotate(event, this.computeData(optimalTarget).rotations,
-                        this.maxAngleChangeProperty.getValue().floatValue(), this.lockViewProperty.getValue());
+                rotate(e, this.computeData(optimalTarget).rotations,
+                        (float) turnSpeed.getInput(), lockView.isToggled());
 
-                if (this.attackMethodProperty.getValue() == AttackTiming.PRE) {
-                    if (this.entityInBlockRange && this.autoblockProperty.getValue() && isHoldingSword()) {
-                        unblock();
-                    }
-                    tryAttack(event);
-                    reblock = true;
-                } else {
-                    if(reblock) {
-                        block();
-                    }
-                }
-
-            } else {
-
-                if(blocking) {
-                    unblock();
+                if (attackTimingSetting.getMode() == AttackTiming.Pre) {
+                    tryAttack(e);
                 }
 
             }
-        }
 
-        if (e.isPre()) {
-
-
-
-
-
-
-
+            lastPitch = e.getPitch();
+            lastYaw = e.getYaw();
         } else {
             if (isOccupied())
                 return;
 
-            if (this.target != null && this.attackMethodProperty.getValue() == AttackTiming.POST) {
-                tryAttack(event);
-            } else if(target != null) {
-
+            if (this.target != null && attackTimingSetting.getMode() == AttackTiming.Post) {
+                tryAttack(e);
             }
         }
     }
@@ -170,12 +178,17 @@ public class Aura extends Module {
 
     public static boolean isAutoBlocking() {
         Aura aura = getInstance();
-        return aura.isEnabled() && (autoblockMode.getMode() != AutoBlock.None && autoblockMode.getMode() != AutoBlock.Fake) && aura.entityInBlockRange;
+        return aura.isEnabled() && aura.entityInBlockRange && Aura.abMode.getMode() != AutoBlockMode.None;
     }
 
     public static boolean isBlocking() {
         Aura aura = getInstance();
         return aura.isEnabled() && aura.blocking;
+    }
+
+    public static boolean doSlowdown() {
+        Aura aura = getInstance();
+        return aura.isEnabled() && aura.blocking && Aura.abMode.getMode().slow;
     }
 
     public static Aura getInstance() {
@@ -223,7 +236,7 @@ public class Aura extends Module {
     }
 
     private boolean isLookingAtEntity(final float yaw, final float pitch) {
-        double range = reach.getInputMin();
+        double range = attackReach.getInput();
         Vec3 src = mc.thePlayer.getPositionEyes(1.0F);
         final Vec3 rotationVec = getVectorForRotation(pitch, yaw);
         Vec3 dest = src.addVector(rotationVec.xCoord * range, rotationVec.yCoord * range, rotationVec.zCoord * range);
@@ -231,10 +244,10 @@ public class Aura extends Module {
                 false, false, true);
         if (obj == null) return false;
         if (obj.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            if (this.checksProperty.isSelected(Checks.RAYTRACE)) return false;
-            else if (this.computeData(this.target).dist > this.rangeThruWalls.getValue()) return false;
+            if (raytrace.isToggled()) return false;
+            else if (this.computeData(this.target).dist > attackReach.getInput()) return false;
         }
-        if (!this.checksProperty.isSelected(Checks.ROTATION)) return true;
+        if (!rotCheck.isToggled()) return true;
         return this.target.getEntityBoundingBox().expand(0.1F, 0.1F, 0.1F).calculateIntercept(src, dest) != null;
     }
 
@@ -263,6 +276,11 @@ public class Aura extends Module {
     public void onDisable() {
         this.target = null;
         this.entityInBlockRange = false;
+
+        if(blocking) {
+            unblock();
+            blocking = false;
+        }
     }
 
     private boolean isInMenu() {
@@ -295,28 +313,27 @@ public class Aura extends Module {
     }
 
     private boolean isValid(EntityLivingBase entity) {
-        if (this.checksProperty.isSelected(Checks.ALIVE) && !entity.isEntityAlive())
+        if (!entity.isEntityAlive())
             return false;
-        if (entity.isInvisible() && !this.targetsProperty.isSelected(Targets.INVISIBLES))
+        if (entity.isInvisible() && !targetInvisibles.isToggled())
             return false;
         if (entity == mc.thePlayer.ridingEntity)
             return false;
         if (entity instanceof EntityOtherPlayerMP) {
             final EntityPlayer player = (EntityPlayer) entity;
-            if (!this.targetsProperty.isSelected(Targets.PLAYERS))
+            if (!targetPlayers.isToggled())
                 return false;
-            if (ModuleManager.getInstance(AntiBot.class).isBot(player))
+            if (AntiBot.bot(entity))
                 return false;
-            if (!this.targetsProperty.isSelected(Targets.TEAMMATES) && PlayerUtils.isTeamMate(player))
+            if (!targetTeammates.isToggled() && isTeamMate(player))
                 return false;
-            if (!targetsProperty.isSelected(Targets.FRIENDS) &&
-                    RadiumClient.getInstance().getPlayerManager().isFriend(player))
+            if (AimAssist.isAFriend(player))
                 return false;
         } else if (entity instanceof EntityMob) {
-            if (!this.targetsProperty.isSelected(Targets.MOBS))
+            if (!targetMobs.isToggled())
                 return false;
         } else if (entity instanceof EntityAnimal) {
-            if (!this.targetsProperty.isSelected(Targets.ANIMALS))
+            if (!targetAnimals.isToggled())
                 return false;
         } else {
             // Ignore any other types of entities
@@ -324,37 +341,28 @@ public class Aura extends Module {
         }
 
         return this.computeData(entity).dist <
-                Math.max(reach.getInputMax(), reach.getInputMin()) &&
-                (!this.checksProperty.isSelected(Checks.FOV) || this.fovCheck(entity, this.fovProperty.getValue().intValue()));
+                Math.max(targetRange.getInput(), attackReach.getInput()) &&
+                (!fovCheck.isToggled() || this.fovCheck(entity, (int) fov.getInput()));
     }
 
-    // like make this work and stuff
-    private enum AutoBlock {
-        None, Fake, Terrible
+    public enum AutoBlockMode {
+        None(false),
+        Fake(false),
+        Vanilla(true);
+
+        public final boolean slow;
+
+        AutoBlockMode(boolean slow) {
+            this.slow = slow;
+        }
     }
 
-    private enum AttackTiming {
+    public enum AttackTiming {
         Pre,
         Post
     }
 
-    private enum Targets {
-        PLAYERS,
-        TEAMMATES,
-        FRIENDS,
-        INVISIBLES,
-        MOBS,
-        ANIMALS
-    }
-
-    private enum Checks {
-        ALIVE,
-        FOV,
-        ROTATION,
-        RAYTRACE
-    }
-
-    private enum SortingMethod {
+    public enum SortingMethod {
         Distance(new DistanceSorting()),
         Health(new HealthSorting()),
         HurtTime(new HurtTimeSorting()),
@@ -470,6 +478,54 @@ public class Aura extends Module {
         return new Vec3(f1 * f2, f3, f * f2);
     }
 
-}
+    private boolean isTeamMate(final EntityPlayer entity) {
+        final String entName = entity.getDisplayName().getFormattedText();
+        final String playerName = mc.thePlayer.getDisplayName().getFormattedText();
+        if (entName.length() < 2 || playerName.length() < 2) return false;
+        if (!entName.startsWith("\247") || !playerName.startsWith("\247")) return false;
+        return entName.charAt(1) == playerName.charAt(1);
+    }
 
- */
+    private void rotate(final UpdateEvent event, final float[] rotations, final float aimSpeed, boolean lockview) {
+        final float[] prevRotations = {lastYaw, lastPitch};
+
+        final float[] cappedRotations = {
+                maxAngleChange(prevRotations[0], rotations[0], aimSpeed),
+                maxAngleChange(prevRotations[1], rotations[1], aimSpeed)
+        };
+
+        final float[] appliedRotations = applyGCD(cappedRotations, prevRotations);
+
+        event.setYaw(appliedRotations[0]);
+        event.setPitch(appliedRotations[1]);
+
+        if (lockview) {
+            mc.thePlayer.rotationYaw = appliedRotations[0];
+            mc.thePlayer.rotationPitch = appliedRotations[1];
+        }
+    }
+
+    private double getMouseGCD() {
+        final float sens = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
+        final float pow = sens * sens * sens * 8.0F;
+        return pow * 0.15D;
+    }
+
+    private float[] applyGCD(final float[] rotations, final float[] prevRots) {
+        final float yawDif = rotations[0] - prevRots[0];
+        final float pitchDif = rotations[1] - prevRots[1];
+        final double gcd = getMouseGCD();
+
+        rotations[0] -= yawDif % gcd;
+        rotations[1] -= pitchDif % gcd;
+        return rotations;
+    }
+
+    private float maxAngleChange(final float prev, final float now, final float maxTurn) {
+        float dif = MathHelper.wrapAngleTo180_float(now - prev);
+        if (dif > maxTurn) dif = maxTurn;
+        if (dif < -maxTurn) dif = -maxTurn;
+        return prev + dif;
+    }
+
+}

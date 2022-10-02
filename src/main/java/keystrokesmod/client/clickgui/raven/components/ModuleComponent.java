@@ -1,24 +1,19 @@
 package keystrokesmod.client.clickgui.raven.components;
 
-import java.awt.Color;
-import java.util.ArrayList;
-
-import org.lwjgl.opengl.GL11;
-
 import keystrokesmod.client.clickgui.raven.Component;
 import keystrokesmod.client.main.Raven;
 import keystrokesmod.client.module.Module;
 import keystrokesmod.client.module.modules.client.GuiModule;
 import keystrokesmod.client.module.setting.Setting;
-import keystrokesmod.client.module.setting.impl.ComboSetting;
-import keystrokesmod.client.module.setting.impl.DescriptionSetting;
-import keystrokesmod.client.module.setting.impl.DoubleSliderSetting;
-import keystrokesmod.client.module.setting.impl.RGBSetting;
-import keystrokesmod.client.module.setting.impl.SliderSetting;
-import keystrokesmod.client.module.setting.impl.TickSetting;
+import keystrokesmod.client.module.setting.impl.*;
 import keystrokesmod.client.utils.font.FontUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.util.ArrayList;
 
 public class ModuleComponent implements Component {
     public Module mod;
@@ -170,10 +165,12 @@ public class ModuleComponent implements Component {
             button_rgb = new Color(102, 102, 102).getRGB();
         }
         if (GuiModule.useCustomFont()) {
+            GlStateManager.resetColor();
             FontUtil.normal.drawCenteredString(this.mod.getName(),
                     (float) (this.category.getX() + this.category.getWidth() / 2),
                     (float) (this.category.getY() + this.o + 4), button_rgb);
         } else {
+            GlStateManager.resetColor();
             Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(this.mod.getName(),
                     (float) (this.category.getX() + this.category.getWidth() / 2
                             - Minecraft.getMinecraft().fontRendererObj.getStringWidth(this.mod.getName()) / 2),

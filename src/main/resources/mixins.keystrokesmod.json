@@ -6,6 +6,8 @@
     "mixins": [
         "IItemBucket",
         "IItemTool",
+        "MixinBlock",
+        "MixinBlockGrass",
         "MixinC03PacketPlayer",
         "MixinEntity",
         "MixinEntityPlayer",
@@ -20,8 +22,11 @@
     "client": [
         "IC0DPacketCloseWindow",
         "IMinecraft",
+        "MixinBlockModelRenderer",
         "MixinGuiIngame",
         "MixinGuiScreen",
-        "MixinGuiSpectator"
+        "MixinGuiSpectator",
+        "MixinItemRenderer",
+        "MixinWorldRenderer"
     ]
 }

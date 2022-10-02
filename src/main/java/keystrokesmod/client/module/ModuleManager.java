@@ -120,6 +120,8 @@ public class ModuleManager {
         addModule(new KvAura());
         addModule(new Spin());
         addModule(new Scaffold());
+        addModule(new XRay());
+        addModule(new Aura());
         //addModule(new SpeedTest());
         //addModule(new LegitAura());
         //addModule(new TargetHUD());
